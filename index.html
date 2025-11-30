@@ -1,180 +1,714 @@
 <!DOCTYPE html>
-<html lang = "en">
+<html lang="en" data-bs-theme="light">
   <head>
-    <meta charset = "UTF-8" />
-    <meta name    = "viewport" content = "width=device-width, initial-scale=1.0" />
-    <title>Oshay's Training Plan</title>
-    <link rel = "stylesheet" href = "./style.css" />
+    <meta charset="UTF-8" />
+    <title>Gemini's Care Plan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Nunito font -->
     <link
-      href        = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel         = "stylesheet"
-      integrity   = "sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-      crossorigin = "anonymous"
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
     />
-    <script src = "./script.js"></script>
-    <script
-      src         = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-      integrity   = "sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-      crossorigin = "anonymous"
-    ></script>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* ===== Base layout + animated gradient ===== */
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Nunito", system-ui, -apple-system, BlinkMacSystemFont,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+
+        /* Very visible animated background */
+        background: linear-gradient(120deg, #ffe2cf, #ffd1ff, #c7e6ff, #ffe2cf);
+        background-size: 300% 300%;
+        /* Slower, calmer animation */
+        animation: gradientShift 26s ease-in-out infinite;
+      }
+
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      html[data-bs-theme="dark"] body {
+        background: linear-gradient(120deg, #020617, #111827, #020617, #0b1120);
+        background-size: 300% 300%;
+        animation: gradientShiftDark 32s ease-in-out infinite;
+      }
+
+      @keyframes gradientShiftDark {
+        0% {
+          background-position: 50% 0%;
+        }
+        50% {
+          background-position: 50% 100%;
+        }
+        100% {
+          background-position: 50% 0%;
+        }
+      }
+
+      .care-card {
+        border-radius: 1.75rem;
+        backdrop-filter: blur(12px);
+        /* Stronger, softer “floating” shadow + subtle border */
+        box-shadow: 0 28px 80px rgba(15, 23, 42, 0.28);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+
+        animation: cardIn 0.6s ease-out forwards;
+        opacity: 0;
+        transform: translateY(12px) scale(0.985);
+      }
+
+      html[data-bs-theme="dark"] .care-card {
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.75);
+        border: 1px solid rgba(15, 23, 42, 0.85);
+      }
+
+      /* Fix Google / Apple Maps buttons in dark mode */
+      html[data-bs-theme="dark"] .btn-outline-primary {
+        color: #93c5fd !important; /* soft light blue */
+        border-color: #93c5fd !important;
+      }
+
+      html[data-bs-theme="dark"] .btn-outline-primary:hover {
+        color: #0f172a !important; /* dark text */
+        background-color: #93c5fd !important;
+        border-color: #93c5fd !important;
+      }
+
+      html[data-bs-theme="dark"] .btn-outline-secondary {
+        color: #cbd5e1 !important; /* soft gray */
+        border-color: #cbd5e1 !important;
+      }
+
+      html[data-bs-theme="dark"] .btn-outline-secondary:hover {
+        color: #0f172a !important;
+        background-color: #cbd5e1 !important;
+        border-color: #cbd5e1 !important;
+      }
+
+      @keyframes cardIn {
+        from {
+          opacity: 0;
+          transform: translateY(16px) scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      .care-image {
+        border-radius: 1rem;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+      }
+
+      .note {
+        font-size: 0.9rem;
+        color: var(--bs-secondary-color);
+      }
+
+      .back-to-top {
+        position: fixed;
+        right: 1.25rem;
+        bottom: 1.25rem;
+        z-index: 1080;
+        display: none;
+      }
+
+      .back-to-top.show {
+        display: inline-flex;
+      }
+
+      /* TOC link styling */
+      .toc-link {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 999px;
+        transition: background-color 0.2s ease, color 0.2s ease;
+      }
+
+      .toc-link.toc-link-active {
+        background-color: rgba(37, 99, 235, 0.12);
+        color: #1d4ed8 !important;
+      }
+
+      html[data-bs-theme="dark"] .toc-link.toc-link-active {
+        background-color: rgba(96, 165, 250, 0.2);
+        color: #bfdbfe !important;
+      }
+
+      /* Dark mode primary link color */
+      html[data-bs-theme="dark"] .link-primary {
+        color: #93c5fd !important;
+      }
+
+      html[data-bs-theme="dark"] .link-primary:hover {
+        color: #bfdbfe !important;
+      }
+      /* Wi-Fi reveal card */
+      .wifi-card-wrapper {
+        margin-top: 0.75rem;
+        opacity: 0;
+        transform: translateY(6px) scale(0.98);
+        pointer-events: none;
+        transition: opacity 0.22s ease-out, transform 0.22s ease-out;
+      }
+
+      .wifi-card-wrapper.show {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: auto;
+      }
+
+      .wifi-card {
+        border-radius: 0.9rem;
+        padding: 0.75rem 0.9rem;
+        background-color: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        font-size: 0.9rem;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
+      }
+
+      html[data-bs-theme="dark"] .wifi-card {
+        background-color: rgba(15, 23, 42, 0.98);
+        border-color: rgba(51, 65, 85, 0.9);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.8);
+      }
+    </style>
   </head>
+  <body>
+    <div class="container py-4 py-md-5">
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-9">
+          <main class="card care-card border-0 bg-body">
+            <div class="card-body p-3 p-md-4 p-lg-5">
+              <!-- ===== Header ===== -->
+              <header
+                class="d-flex justify-content-between align-items-start gap-3 mb-3"
+              >
+                <div>
+                  <h1 class="h3 mb-1">Gemini&#39;s Care Plan</h1>
+                  <p class="text-muted small mb-0">11/30 &rarr; 12/12</p>
+                </div>
 
-  <body class = "gradient-background">
-  <div  id    = "cards-container">
-  <div  class = "card">
-  <div  class = "card-body bg-body-tertiary">
-          <h5>Legend</h5>
-          <div class = "legend">
-          <ul>(SM) Smith Machine</ul>
-          <ul>(BB) Barbell</ul>
-          <ul>(DB) Dumbbell</ul>
-        </div>
-        </div>
-        </div>
-      </div>
-    </div>
-    <div id    = "cards-container">
-    <div class = "card">
-    <div class = "card-body bg-body-tertiary">
-          <h4>Day 1</h4>
-          <div class = "title-block" >
-          <h6>Chest - Delts - Traps (Lower Abs - Cardio 30m)</h6>
-          </div>
-          <hr>
-          <div class = "workouts">
-            <ul>     (SM) Incline press <span id    = "sets-reps">5 x 8-12</span></ul>
-            <ul>     (BB) Bench press <span id      = "sets-reps">5 x 8-12</span></ul>
-            <ul>     (DB) Hex press <span id        = "sets-reps">3 x 8-12</span></ul>
-            <ul>Pec   dec fly <span id              = "sets-reps">3 x 8-12</span></ul>
-            <ul>     (SM) Overhead press <span id   = "sets-reps">4 x 8-12</span></ul>
-            <ul>     (DB) Lateral raises <span id   = "sets-reps">6 x 8-12</span></ul>
-            <ul>     (BB) Front raises <span id     = "sets-reps">4 x 8-12</span></ul>
-            <ul>     (DB) Rear delt raises <span id = "sets-reps">4 x 8-12</span></ul>
-            <ul>     (SM) Shrugs <span id           = "sets-reps">4 x 8-12</span></ul>
-            <ul>Cable face pulls <span id           = "sets-reps">3 x 8-12</span></ul>
-          </div>
-        </div>
-        </div>
-      </div>
+                <div class="d-flex align-items-center gap-2">
+                  <!-- TOC toggle button -->
+                  <button
+                    class="btn btn-sm btn-outline-primary rounded-pill d-flex align-items-center gap-1"
+                    type="button"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#tocOffcanvas"
+                    aria-controls="tocOffcanvas"
+                  >
+                    <span class="fw-semibold">Sections</span> ☰
+                  </button>
 
-    </div>
-    <div id    = "cards-container">
-    <div class = "card">
-    <div class = "card-body bg-body-tertiary">
-          <h4>Day 2</h4>
-          <div class = "title-block" >
-          <h6>Back - Triceps - Biceps (Upper Abs - Cardio 30m)</h6>
-          </div>
-          <hr>
-          <div       class                               = "workouts">
-          <ul>Lat    pulldowns <span id                  = "sets-reps">7 x 8-12</span></ul>
-          <ul>      (SM) Underhand row <span id          = "sets-reps">5 x 8-12</span></ul>
-          <ul>Cable  close grip row <span id             = "sets-reps">4 x 8-12</span></ul>
-          <ul>Close  grip lat pulldowns <span id         = "sets-reps">4 x 8-12</span></ul>
-          <ul>Cable  stiff lat pulldowns <span id        = "sets-reps">3 x 8-12</span></ul>
-          <ul>Lower  back extensions <span id            = "sets-reps">3 x 12-15</span></ul>
-          <ul>Tricep rope extensions <span id            = "sets-reps">7 x 8-12</span></ul>
-          <ul>Skull  crushers <span id                   = "sets-reps">5 x 8-12</span></ul>
-          <ul>Cable  tricep extensions <span id          = "sets-reps">4 x 8-12</span></ul>
-          <ul>Cable  tricep overhead extensions <span id = "sets-reps">4 x 8-12</span></ul>
-          <ul>      (BB) Curls <span id                  = "sets-reps">7 x 8-12</span></ul>
-          <ul>      (DB) Preacher curls <span id         = "sets-reps">4 x 8-12</span></ul>
-          <ul>      (DB) Hammer curls <span id           = "sets-reps">4 x 8-12</span></ul>
-          <ul>Cable  curls <span id                      = "sets-reps">4 x 8-12</span></ul>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id    = "cards-container">
-    <div class = "card">
-    <div class = "card-body bg-body-tertiary">
-          <h4>Day 3</h4>
-          <div class = "title-block" >
-          <h6>Quads - Hamstrings - Calves (Obliques - Stairmaster 30m)</h6>
-          </div>
-          <hr>
-          <div          class                     = "workouts">
-          <ul>Hamstring curls <span id            = "sets-reps">6 x 8-12</span></ul>
-          <ul>Squats    <span id                  = "sets-reps">6 x 8-12</span></ul>
-          <ul>Leg       press <span id            = "sets-reps">4 x 8-12</span></ul>
-          <ul>Leg       extensions <span id       = "sets-reps">6 x 8-12</span></ul>
-          <ul>Calf      raises <span id           = "sets-reps">4 x 8-12</span></ul>
-          <ul>Bulgarian squats <span id           = "sets-reps">4 x 8-12</span></ul>
-          <ul>Inner     abductor machine <span id = "sets-reps">3 x 8-12</span></ul>
-          <ul>Outer     abductor machine <span id = "sets-reps">3 x 8-12</span></ul>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id    = "cards-container">
-    <div class = "card">
-    <div class = "card-body bg-body-tertiary">
-          <h4>Day 4</h4>
-          <div class = "title-block" >
-          <h6>Chest - Delts - Traps (Lower Abs - Cardio 30m)</h6>
-          </div>
-          <hr>
-          <div        class                                       = "workouts">
-          <ul>       (DB) Flat press <span id                     = "sets-reps">5 x 8-12</span></ul>
-          <ul>       (DB) Incline press <span id                  = "sets-reps">5 x 8-12</span></ul>
-          <ul>Cable   fly <span id                                = "sets-reps">6 x 8-12</span></ul>
-          <ul>       (SM) Overhead press <span id                 = "sets-reps">5 x 8-12</span></ul>
-          <ul>       (DB) Lateral <span id                        = "sets-reps">6 x 8-12</span></ul>
-          <ul>       (BB) Backwards incline front raises <span id = "sets-reps">6 x 8-12</span></ul>
-          <ul>Reverse pec dec fly <span id                        = "sets-reps">5 x 8-12</span></ul>
-          <ul>       (DB) Shrugs <span id                         = "sets-reps">4 x 8-12</span></ul>
-          <ul>Cable   face pulls <span id                         = "sets-reps">4 x 8-12</span></ul>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id    = "cards-container">
-    <div class = "card">
-    <div class = "card-body bg-body-tertiary">
-          <h4>Day 5</h4>
-          <div class = "title-block" >
-          <h6>Back - Triceps - Biceps (Upper Abs - Cardio 30m)</h6>
-          </div>
-          <hr>
-          <div       class                                     = "workouts">
-          <ul>Lat    pulldowns <span id                        = "sets-reps">7 x 8-12</span></ul>
-          <ul>Iso    lat pulldowns <span id                    = "sets-reps">4 x 8-12</span></ul>
-          <ul>Close  grip row <span id                         = "sets-reps">4 x 8-12</span></ul>
-          <ul>      (SM) Row <span id                          = "sets-reps">4 x 8-12</span></ul>
-          <ul>      (BB) Skull crushers <span id               = "sets-reps">6 x 8-12</span></ul>
-          <ul>      (DB) Tricep extensions <span id            = "sets-reps">4 x 8-12</span></ul>
-          <ul>Cable  iso tricep extensions <span id            = "sets-reps">4 x 8-12</span></ul>
-          <ul>Tricep dips <span id                             = "sets-reps">3 x 8-12</span></ul>
-          <ul>      (DB) Preacher hammer curls <span id        = "sets-reps">6 x 8-12</span></ul>
-          <ul>      (BB) Preacher curls <span id               = "sets-reps">5 x 8-12</span></ul>
-          <ul>      (DB) Incline iso spider man curls <span id = "sets-reps">3 x 8-12</span></ul>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id    = "cards-container">
-    <div class = "card">
-    <div class = "card-body bg-body-tertiary">
-          <h4>Day 6</h4>
-          <div class = "title-block" >
-          <h6>Quads - Hamstrings - Calves (Obliques - Stairmaster 30m)</h6>
-          </div>
-          <hr>
-          <div          class                          = "workouts">
-          <ul>Hamstring curls <span id                 = "sets-reps">5 x 8-12</span></ul>
-          <ul>Squats    <span id                       = "sets-reps">6 x 8-12</span></ul>
-          <ul>Hacksquat <span id                       = "sets-reps">3 x 8-12</span></ul>
-          <ul>Leg       extensions <span id            = "sets-reps">5 x 8-12</span></ul>
-          <ul>Calf      raises <span id                = "sets-reps">4 x 8-12</span></ul>
-          <ul>Bulgarian squats <span id                = "sets-reps">6 x 8-12</span></ul>
-          <ul>         (DB) Romanian deadlift <span id = "sets-reps">3 x 8-12</span></ul>
-          <ul>Inner     abductor machine <span id      = "sets-reps">3 x 8-12</span></ul>
-          <ul>Outer     abductor machine <span id      = "sets-reps">3 x 8-12</span></ul>
-          </div>
-        </div>
-      </div>
-    </div>
-    <br>
+                  <!-- Theme toggle button -->
+                  <button
+                    id="themeToggle"
+                    class="btn btn-sm btn-outline-secondary rounded-pill d-flex align-items-center gap-1"
+                    type="button"
+                    aria-label="Toggle dark mode"
+                  >
+                    <span class="fw-semibold">Theme</span>
+                    <span id="themeIcon">🌙</span>
+                  </button>
+                </div>
+              </header>
 
+              <!-- ===== Content Sections ===== -->
+
+              <section id="home-address" class="mb-4">
+                <h2 class="h5 mb-2">🏠 Home Address</h2>
+                <p class="mb-1">
+                  622 Rainier Ave South, Apt A409<br />Seattle, WA 98144
+                </p>
+                <p class="note mb-2">
+                  Search “HiLite Apartments” — it appears in Maps easily.
+                </p>
+                <p class="mb-1">
+                  <a
+                    href="https://www.google.com/maps/search/?api=1&query=622+Rainier+Ave+South+A409+Seattle+WA+98144"
+                    target="_blank"
+                    class="btn btn-sm btn-outline-primary rounded-pill"
+                    >➤ Open in Google Maps</a
+                  >
+                </p>
+                <p class="mb-0">
+                  <a
+                    href="http://maps.apple.com/?q=622+Rainier+Ave+South+A409+Seattle+WA+98144"
+                    target="_blank"
+                    class="btn btn-sm btn-outline-secondary rounded-pill"
+                    >➤ Open in Apple Maps</a
+                  >
+                </p>
+              </section>
+
+              <section id="garage-directions" class="mb-4">
+                <h2 class="h5 mb-2">🚗 Garage Directions</h2>
+                <p class="mb-2">From Lisa&#39;s apartment:</p>
+                <ul class="mb-0">
+                  <li>Start on the side street with the trash bins.</li>
+                  <li>Drive toward the stop sign (school straight ahead).</li>
+                  <li>
+                    Continue straight and stay on the
+                    <span class="fw-semibold">right</span> side of the building.
+                  </li>
+                  <li>
+                    The garage entrance is on the
+                    <span class="fw-semibold">back side</span> — a ramp going
+                    down.
+                  </li>
+                </ul>
+              </section>
+
+              <section id="parking-building-access" class="mb-4">
+                <h2 class="h5 mb-2">🅿️ Parking &amp; Building Access</h2>
+                <ul class="mb-0">
+                  <li>
+                    Park in stall <span class="fw-semibold">#48</span> — last
+                    spot on the <span class="fw-semibold">left</span>, right in
+                    front of the elevators.
+                  </li>
+                  <li>Enter through the door next to the elevators.</li>
+                  <li>
+                    Use the <span class="fw-semibold">key fob</span> in the
+                    elevator &rarr; 4th floor.
+                  </li>
+                  <li>Exit, turn <span class="fw-semibold">right</span>.</li>
+                  <li>
+                    My unit (<span class="fw-semibold">A409</span>) is the door
+                    on the left at the end of the hallway.
+                  </li>
+                </ul>
+              </section>
+
+              <section id="image-section" class="mb-4 text-center">
+                <img
+                  src="assets/home-directions.png"
+                  alt="Building / Parking Photo"
+                  class="img-fluid care-image mb-2"
+                />
+                <p class="note mb-0">
+                  (Reference photo to help you find the area)
+                </p>
+              </section>
+
+              <hr class="my-4" />
+
+              <section id="introduction" class="mb-4">
+                <h2 class="h5 mb-2">💛 Introduction</h2>
+                <p>
+                  Thank you so much for taking care of Gemini while I’m away.
+                  She means a lot to me — I’ve had her since she was two weeks
+                  old, bottle-feeding and raising her through everything. She’s
+                  been a huge part of my life, especially after the military.
+                </p>
+                <p>
+                  She’s very “human” in how she interacts. Gemini talks, watches
+                  what you’re doing, and loves gentle attention. She may be shy
+                  at first but warms up quickly once she feels safe.
+                </p>
+                <p class="note mb-0">
+                  <span class="fw-semibold">Note:</span> She loves burrowing
+                  under blankets and coats. Please check before sitting down —
+                  she’s often curled up in hidden cozy spots.
+                </p>
+              </section>
+
+              <section id="feeding-water-litter" class="mb-4">
+                <h2 class="h5 mb-2">🍽 Feeding, Water &amp; Litter</h2>
+                <p class="mb-2">
+                  Gemini is low-maintenance thanks to her automatic setup:
+                </p>
+                <ul>
+                  <li>Feeder: <span class="fw-semibold">3 meals/day</span></li>
+                  <li>
+                    Water fountain:
+                    <span class="fw-semibold">always flowing</span>
+                  </li>
+                  <li>
+                    Litter box: <span class="fw-semibold">self-cleaning</span>
+                  </li>
+                </ul>
+                <p>I’ll fully refill everything before I leave.</p>
+                <p class="mb-0">
+                  However, the
+                  <span class="fw-semibold">most important thing</span> she
+                  needs is <span class="fw-semibold">human interaction</span>.
+                  She gets anxious and sad when I’m not home, so talking to her,
+                  petting her, or letting her sit nearby helps her feel safe and
+                  comforted.
+                </p>
+              </section>
+
+              <section id="what-to-check" class="mb-4">
+                <h2 class="h5 mb-2">🔍 What to Check</h2>
+
+                <h3 class="h6 mt-2">Every 3–4 Days — Water Fountain</h3>
+                <ul>
+                  <li>Push side latches outward.</li>
+                  <li>Lift metal top.</li>
+                  <li>Refill if needed.</li>
+                </ul>
+
+                <h3 class="h6 mt-3">Every Week — Litter Box Bag</h3>
+                <ul>
+                  <li>Pull the steps forward.</li>
+                  <li>Check waste drawer.</li>
+                  <li>Replace bag if full.</li>
+                </ul>
+
+                <h3 class="h6 mt-3">As Needed — Food Feeder</h3>
+                <ul class="mb-0">
+                  <li>Twist lid.</li>
+                  <li>Check kibble level.</li>
+                </ul>
+              </section>
+
+              <section id="supplies" class="mb-4">
+                <h2 class="h5 mb-2">📦 Supplies</h2>
+                <p class="mb-2">
+                  Stored behind the
+                  <span class="fw-semibold">kitchen island</span>, in the
+                  <span class="fw-semibold">bottom-right two cupboards</span>:
+                </p>
+                <ul class="mb-0">
+                  <li>Cat food</li>
+                  <li>Litter box bags</li>
+                </ul>
+              </section>
+
+              <hr class="my-4" />
+
+              <section id="make-yourself-at-home" class="mb-2">
+                <h2 class="h5 mb-2">🤍 Make Yourself at Home</h2>
+                <p>
+                  Feel free to eat anything I have in the kitchen. I’m sorry I
+                  don’t have a lot of necessities like paper towels, plates,
+                  bowls, or extra trash cans — but whatever is there, you’re
+                  absolutely welcome to use.
+                </p>
+                <p class="mb-2">
+                  You can also use my desk, workspace, or anything else you may
+                  need while you're here. Thank you again for helping with
+                  Gemini — I really appreciate you.
+                </p>
+
+                <!-- Wi-Fi reveal toggle -->
+                <div class="mt-3">
+                  <button
+                    id="wifiToggle"
+                    type="button"
+                    class="btn btn-sm btn-outline-primary rounded-pill d-inline-flex align-items-center gap-1"
+                  >
+                    <span id="wifiToggleLabel">📶 Tap to see Wi-Fi info</span>
+                  </button>
+                </div>
+
+                <!-- Wi-Fi info (no password exposed) -->
+                <div id="wifiCard" class="wifi-card-wrapper">
+                  <div class="wifi-card mt-2">
+                    <div class="fw-semibold mb-1">
+                      Where to Find the Wi-Fi Details
+                    </div>
+
+                    <p class="mb-2">
+                      The Wi-Fi name is <strong>Capricorn</strong> and the Wi-Fi
+                      password
+                      <strong>under</strong>
+                      Gemini's metal food bowl.
+                    </p>
+
+                    <p class="mb-0 note">
+                      You can lift the metal bowl with her food in it.
+                    </p>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back to top button -->
+    <button
+      id="backToTop"
+      class="btn btn-dark rounded-circle back-to-top align-items-center justify-content-center"
+      type="button"
+      aria-label="Back to top"
+    >
+      ↑
+    </button>
+
+    <!-- Offcanvas Table of Contents -->
+    <nav
+      class="offcanvas offcanvas-end"
+      tabindex="-1"
+      id="tocOffcanvas"
+      aria-labelledby="tocOffcanvasLabel"
+    >
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="tocOffcanvasLabel">
+          Table of Contents
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="list-unstyled mb-0 small">
+          <li class="mb-2">
+            <button
+              type="button"
+              class="btn btn-link p-0 text-decoration-none link-primary toc-link"
+              data-target="home-address"
+              data-bs-dismiss="offcanvas"
+            >
+              Home Address
+            </button>
+          </li>
+          <li class="mb-2">
+            <button
+              type="button"
+              class="btn btn-link p-0 text-decoration-none link-primary toc-link"
+              data-target="garage-directions"
+              data-bs-dismiss="offcanvas"
+            >
+              Garage Directions
+            </button>
+          </li>
+          <li class="mb-2">
+            <button
+              type="button"
+              class="btn btn-link p-0 text-decoration-none link-primary toc-link"
+              data-target="parking-building-access"
+              data-bs-dismiss="offcanvas"
+            >
+              Parking &amp; Building Access
+            </button>
+          </li>
+          <li class="mb-2">
+            <button
+              type="button"
+              class="btn btn-link p-0 text-decoration-none link-primary toc-link"
+              data-target="introduction"
+              data-bs-dismiss="offcanvas"
+            >
+              Introduction
+            </button>
+          </li>
+          <li class="mb-2">
+            <button
+              type="button"
+              class="btn btn-link p-0 text-decoration-none link-primary toc-link"
+              data-target="feeding-water-litter"
+              data-bs-dismiss="offcanvas"
+            >
+              Feeding, Water &amp; Litter
+            </button>
+          </li>
+          <li class="mb-2">
+            <button
+              type="button"
+              class="btn btn-link p-0 text-decoration-none link-primary toc-link"
+              data-target="what-to-check"
+              data-bs-dismiss="offcanvas"
+            >
+              What to Check
+            </button>
+          </li>
+          <li class="mb-2">
+            <button
+              type="button"
+              class="btn btn-link p-0 text-decoration-none link-primary toc-link"
+              data-target="supplies"
+              data-bs-dismiss="offcanvas"
+            >
+              Supplies
+            </button>
+          </li>
+          <li class="mb-2">
+            <button
+              type="button"
+              class="btn btn-link p-0 text-decoration-none link-primary toc-link"
+              data-target="make-yourself-at-home"
+              data-bs-dismiss="offcanvas"
+            >
+              Make Yourself at Home
+            </button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Bootstrap JS -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      (function () {
+        const root = document.documentElement;
+        const themeToggle = document.getElementById("themeToggle");
+        const themeIcon = document.getElementById("themeIcon");
+        const backToTop = document.getElementById("backToTop");
+
+        // Theme setup with localStorage
+        const storedTheme = localStorage.getItem("theme");
+        const prefersDark =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+        if (storedTheme) {
+          root.setAttribute("data-bs-theme", storedTheme);
+        } else if (prefersDark) {
+          root.setAttribute("data-bs-theme", "dark");
+        }
+
+        function updateThemeIcon() {
+          const current = root.getAttribute("data-bs-theme") || "light";
+          themeIcon.textContent = current === "dark" ? "☀︎" : "🌙";
+        }
+
+        if (themeToggle && themeIcon) {
+          updateThemeIcon();
+          themeToggle.addEventListener("click", () => {
+            const current = root.getAttribute("data-bs-theme") || "light";
+            const next = current === "dark" ? "light" : "dark";
+            root.setAttribute("data-bs-theme", next);
+            localStorage.setItem("theme", next);
+            updateThemeIcon();
+          });
+        }
+
+        // Back to top visibility & behavior
+        window.addEventListener("scroll", () => {
+          if (window.scrollY > 240) {
+            backToTop.classList.add("show");
+          } else {
+            backToTop.classList.remove("show");
+          }
+        });
+
+        backToTop.addEventListener("click", () => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        // TOC buttons: scroll to section
+        document.querySelectorAll(".toc-link[data-target]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const id = btn.getAttribute("data-target");
+            const target = document.getElementById(id);
+            if (target) {
+              target.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+            // subtle tap feedback
+            btn.classList.add("toc-link-active");
+            setTimeout(() => btn.classList.remove("toc-link-active"), 200);
+          });
+        });
+
+        // Wi-Fi reveal toggle + copy
+        const wifiToggle = document.getElementById("wifiToggle");
+        const wifiToggleLabel = document.getElementById("wifiToggleLabel");
+        const wifiCard = document.getElementById("wifiCard");
+        const wifiCopyBtn = document.getElementById("wifiCopyBtn");
+        const wifiSsidText = document.getElementById("wifiSsidText");
+        const wifiPasswordText = document.getElementById("wifiPasswordText");
+
+        // Show/hide Wi-Fi card
+        if (wifiToggle && wifiToggleLabel && wifiCard) {
+          wifiToggle.addEventListener("click", () => {
+            const isShown = wifiCard.classList.toggle("show");
+            wifiToggleLabel.textContent = isShown
+              ? "🙈 Hide Wi-Fi details"
+              : "📶 Tap to see Wi-Fi";
+          });
+        }
+
+        // Copy Wi-Fi PASSWORD only (not SSID)
+        if (wifiCopyBtn && wifiPasswordText) {
+          wifiCopyBtn.addEventListener("click", async () => {
+            const pwd = wifiPasswordText.textContent.trim(); // only the password
+
+            const originalText = wifiCopyBtn.textContent;
+            wifiCopyBtn.textContent = "Copying…";
+
+            let success = false;
+
+            try {
+              // Prefer modern Clipboard API
+              if (
+                navigator.clipboard &&
+                typeof navigator.clipboard.writeText === "function" &&
+                (window.isSecureContext || location.hostname === "localhost")
+              ) {
+                await navigator.clipboard.writeText(pwd);
+                success = true;
+              } else {
+                // Fallback for non-secure contexts (like Live Server)
+                const textarea = document.createElement("textarea");
+                textarea.value = pwd;
+                textarea.setAttribute("readonly", "");
+                textarea.style.position = "fixed";
+                textarea.style.left = "-9999px";
+                textarea.style.top = "0";
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                try {
+                  success = document.execCommand("copy");
+                } finally {
+                  document.body.removeChild(textarea);
+                }
+              }
+            } catch (err) {
+              success = false;
+            }
+
+            wifiCopyBtn.textContent = success ? "Copied ✅" : "Copy failed ❌";
+
+            setTimeout(() => {
+              wifiCopyBtn.textContent = originalText;
+            }, 1800);
+          });
+        }
+      })();
+    </script>
   </body>
 </html>
